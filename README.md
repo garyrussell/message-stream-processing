@@ -1,5 +1,7 @@
 # Message Stream Processing
 
+## Overview
+
 This demo shows how to process, enrich and route messages to different sinks.
 
 ![alt text](dataflow.png "Flow Of Data")
@@ -10,6 +12,12 @@ The components involved, and where they are deployed within the Cloud are as fol
 
 ![alt text](components.png "Components")
 
+## Set Up
 
+## Transforming From SOAP to JSON
+
+## Routing Messages
+
+## Configuring Routing Behavior
 
 
