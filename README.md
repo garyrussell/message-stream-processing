@@ -14,6 +14,11 @@ The components involved, and where they are deployed within the Cloud are as fol
 
 ## Set Up
 
+
+### Spring Cloud Data Flow Server
+To set up the Spring Cloud Data Flow (SCDF) Server, please follow the steps in this repo:
+https://github.com/lshannon/spring-cloud-data-flow-setup
+
 ## Transforming From SOAP to JSON
 
 ## Routing Messages
