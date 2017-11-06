@@ -55,6 +55,15 @@ cf create-service cloudamqp lemur messages
 
 ## Transforming From SOAP to JSON
 
+### Installing The Transformer
+
+The soap-to-json-transformer will be published to a local repository. This allows us to connect from the local machine to remote Spring Cloud Data Flow Server to register the custom component.
+
+```shell
+
+app register --name xml-json-enricher --type processor --uri maven://com.lukeshannon.datastreaming:soap-to-json-processor:0.0.1.jar
+
+```
 ## Routing Messages
 
 ## Configuring Routing Behavior
