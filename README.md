@@ -80,7 +80,8 @@ Next we will register the component with SCDF's Data Server running in PWS.
 
 ```shell
 
-app register --name xml-json-enricher --type processor --uri maven://com.lukeshannon.datastreaming:soap-to-json-processor:0.0.1.jar
+dataflow:>app register --name soap-to-json-transformer --type processor --uri file:///Users/lshannon/Documents/message-stream-processing/soap-to-json-transformer/build/libs/soap-to-json-transformer-0.1.0.jar
+Successfully registered application 'processor:soap-to-json-transformer'
 
 ```
 ## Routing Messages
