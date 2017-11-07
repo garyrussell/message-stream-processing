@@ -73,7 +73,7 @@ The following registers the component in SCDF's Data Server running in PWS.
 
 ```shell
 
-dataflow:>app register --name soap-to-json-transformer --type processor --uri file:///Users/lshannon/Documents/message-stream-processing/soap-to-json-transformer/build/libs/soap-to-json-transformer-0.1.0.jar
+dataflow:>app register --name xml-json-enricher --type processor --uri https://github.com/lshannon/message-stream-processing/blob/master/soap-to-json-transformer-0.1.0.jar
 Successfully registered application 'processor:soap-to-json-transformer'
 
 ```
