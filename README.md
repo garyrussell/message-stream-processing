@@ -67,16 +67,9 @@ The Output is a different Rabbit MQ. Specifically the one the SCDF streams are u
 
 ### Installing The Transformer
 
-The soap-to-json-transformer will be published to a local repository. The gradle maven-plugin was added to the project to achieve this goal.
+The are a few ways to get the binary for the component on to the server. For this example the jar has been added to github. The link to this binary can be used in the URI.
 
-```shell
-
-./gradlew clean build publish
-
-```
-This will also generate the same classes using Jaxb from the same XSD that the message producer uses.
-
-Next we will register the component with SCDF's Data Server running in PWS.
+The following registers the component in SCDF's Data Server running in PWS.
 
 ```shell
 
@@ -84,6 +77,9 @@ dataflow:>app register --name soap-to-json-transformer --type processor --uri fi
 Successfully registered application 'processor:soap-to-json-transformer'
 
 ```
+For more on registering components:
+https://docs.spring.io/spring-cloud-dataflow/docs/1.2.1.RELEASE/reference/html/spring-cloud-dataflow-register-apps.html
+
 ## Routing Messages
 
 ## Configuring Routing Behavior
