@@ -27,7 +27,7 @@ https://spring.io/guides/gs/producing-web-service/
 
 #### Setting Up RabbitMQ Locally
 
-To build this code locally you will need a RabbitMQ running locally. With a Mac this can be done using Brew:
+To build this code locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory. With a Mac installing Rabbit can be done using Brew:
 
 ```shell
 
@@ -36,28 +36,47 @@ brew install rabbitmq
 brew services start rabbitmq
 
 ```
-The admin console can be found here:
+After the installation, admin console can be found here:
 http://127.0.0.1:15672/
 (guest/guest)
 
-To get this to work locally there need to be a fan out exchange called 'messages' that is bound to a Queue (can call it anything you want).
+The way this Spring Boot application is configured, a Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) and the Exchange bound to the Queue. These details can be found in the MessageQueueConfig class.
 
 #### Setting Up RabbitMQ on PWS
 
-Simply create a free instance of the CloudAMQP broker:
+Simply create a free instance of the CloudAMQP broker from the Marketplace:
 
 ```shell
 
 cf create-service cloudamqp lemur messages
 
 ```
-
+Similar to local, once the application is connected it will create the necessary queues and exchanges.
 
 ## Transforming From SOAP to JSON
 
+To do this we will need to:
+
+1. Create a Processor class with a Stream Listener to specifiy the input and output
+2. Install this application into the local maven repository (a remote one can be used as well)
+3. Register the component with the SCDF Data Server running on PWS
+
+The Input is going to be the Rabbit MQ our message production application is posting messages too.
+
+The Output is a different Rabbit MQ. Specifically the one the SCDF streams are using as a backing data bus. Kafka can also be used here, however PWS does not have a Kafka service. So Rabbit it is.
+
 ### Installing The Transformer
 
-The soap-to-json-transformer will be published to a local repository. This allows us to connect from the local machine to remote Spring Cloud Data Flow Server to register the custom component.
+The soap-to-json-transformer will be published to a local repository. The gradle maven-plugin was added to the project to achieve this goal.
+
+```shell
+
+./gradlew clean build publish
+
+```
+This will also generate the same classes using Jaxb from the same XSD that the message producer uses.
+
+Next we will register the component with SCDF's Data Server running in PWS.
 
 ```shell
 
