@@ -3,7 +3,7 @@
   echo "Read In: $USERNAME"
   echo ""
 
-  echo 'Enter the PWS Password:'
+  echo 'Enter the PWS Password (will not be shown as you type):'
   read -s PASSWORD
   echo "Got a Password but will not echo it for security"
   echo ""

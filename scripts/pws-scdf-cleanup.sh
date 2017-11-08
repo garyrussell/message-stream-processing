@@ -26,19 +26,16 @@ if [ "$CONFIRMATION" != "Y" ]; then
 	exit 0;
 fi
 
+echo "Deleting the Server in PWS"
+	cf delete $ADMIN -f
+echo ""
+
 echo "Deleting the Redis Service"
 	cf delete-service $REDIS -f
 echo ""
 
 echo "Deleting the MySql Service"
 	cf delete-service $MYSQL -f
-echo ""
-
-echo "Checking for the Data Server Artifact to deploy to PWS: spring-cloud-dataflow-server-cloudfoundry-1.2.4.RELEASE.jar"
-echo ""
-
-echo "Deleting the Server in PWS"
-	cf delete $ADMIN -f
 echo ""
 
 echo "Clean Up Completed"

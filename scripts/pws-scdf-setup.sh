@@ -13,8 +13,8 @@ echo "This samples requires a more robust RabbitMQ plan (ie: Tiger)"
 
 # Create the names for the services and application
 ADMIN="$ORG$SPACE-dataflow-server"
-REDIS="scdf-rabbitmq-queue"
-RABBIT="$ORG$SPACE-scdf-rabbit"
+REDIS="$ORG$SPACE-scdf-redis"
+RABBIT="scdf-rabbitmq-queue"
 MYSQL="$ORG$SPACE-scdf-mysql"
 
 echo "The Data Server will be called: $ADMIN "
@@ -45,7 +45,7 @@ echo "cf set-env $ADMIN SPRING_CLOUD_DEPLOYER_CLOUDFOUNDRY_SPACE $SPACE"
 echo ""
 
 echo "Do you wish to run these commands (there will be a charge for all these services in PWS)? (Type 'Y' to proceed)"
-read -s CONFIRMATION
+read CONFIRMATION
 if [ "$CONFIRMATION" != "Y" ]; then
 	echo "Script Terminating"
 	exit 0;
@@ -82,7 +82,7 @@ fi
 echo ""
 
 echo "Pusing the Server to PCF"
-	cf push $ADMIN --no-start -p server/spring-cloud-dataflow-server-cloudfoundry-1.2.4.RELEASE.jar
+	cf push $ADMIN --no-start -b java_buildpack -m 2G -k 2G -p server/spring-cloud-dataflow-server-cloudfoundry-1.2.4.RELEASE.jar
 echo ""
 
 echo "Binding the Redis Service to the Server"
