@@ -5,3 +5,22 @@ stream create rabbittest --definition "rabbit --queues=messages | log" --deploy
 stream destroy rabbittest
 exit
 // dataflow 1.2.0.RELEASE log closed at 2017-11-07 19:29:37
+// dataflow 1.2.0.RELEASE log opened at 2017-11-07 19:43:44
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+stream create rabbittest --definition "rabbit --queues=messages | log" --deploy
+stream list
+stream destroy --name rabbittest
+app register --name soap-to-json-transformer --type processor --uri https://github.com/lshannon/message-stream-processing/blob/master/soap-to-json-transformer-0.1.0.jar
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+stream destroy --name message-ingest
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+stream destroy --name message-ingest
+app unregister --name soap-to-json-transformer --type processor
+app register --name soap-to-json-transformer --type processor --uri https://github.com/lshannon/message-stream-processing/blob/master/soap-to-json-transformer-0.1.0.jar
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+app import --uri http://bit.ly/stream-applications-rabbit-maven
+stream destroy --name message-ingest
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+stream destroy --name message-ingest
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy

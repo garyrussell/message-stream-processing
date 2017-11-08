@@ -84,6 +84,7 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-web-services")
     compile("org.springframework.boot:spring-boot-starter-amqp")
     compile("org.springframework.cloud:spring-cloud-starter-stream-rabbit")
+    compile("org.springframework.cloud:spring-cloud-stream-binder-rabbit")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     compile("wsdl4j:wsdl4j:1.6.1")
     jaxb("org.glassfish.jaxb:jaxb-xjc:2.2.11")

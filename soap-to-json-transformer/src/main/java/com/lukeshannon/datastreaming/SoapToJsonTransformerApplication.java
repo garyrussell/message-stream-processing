@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.xml.transform.StringSource;
+
 import io.spring.guides.gs_producing_web_service.Country;
 
 @SpringBootApplication
@@ -27,6 +28,7 @@ public class SoapToJsonTransformerApplication {
 		SpringApplication.run(SoapToJsonTransformerApplication.class, args);
 	}
 	
+
 	@StreamListener(Processor.INPUT)
 	@SendTo(Processor.OUTPUT)
 	public Message processesTsysMessage(String payload) {
