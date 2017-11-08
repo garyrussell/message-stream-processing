@@ -15,7 +15,9 @@ The components involved, and where they are deployed within the Cloud are as fol
 ## Set Up
 
 ### Spring Cloud Data Flow Server
+
 To set up the Spring Cloud Data Flow (SCDF) Server, please follow the steps in this repo:
+
 https://github.com/lshannon/spring-cloud-data-flow-setup
 
 We will use the Server to create and manage streams.
@@ -23,24 +25,29 @@ We will use the Server to create and manage streams.
 ### Message Production
 
 Our messages will be SOAP messages being published on to Rabbit MQ queue. They will come as a steady stream. To get this result we took the following code base and made a few tweaks for it to write its SOAP Objects into a RabbitMQ exchange:
+
 https://spring.io/guides/gs/producing-web-service/
 
-#### Setting Up RabbitMQ Locally
+#### Setting Up RabbitMQ Locally (Only if you wish to build the message-producer)
 
-To build this code locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory. With a Mac installing Rabbit can be done using Brew:
+To build the message-producer locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory. With a Mac installing Rabbit can be done using Brew:
 
 ```shell
 
 brew install rabbitmq
+
 ...
+
 brew services start rabbitmq
 
 ```
 After the installation, admin console can be found here:
+
 http://127.0.0.1:15672/
+
 (guest/guest)
 
-The way this Spring Boot application is configured, a Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) and the Exchange bound to the Queue. These details can be found in the MessageQueueConfig class.
+The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the message-producer.
 
 #### Setting Up RabbitMQ on PWS
 
@@ -65,6 +72,12 @@ The Input is going to be the Rabbit MQ our message production application is pos
 
 The Output is a different Rabbit MQ. Specifically the one the SCDF streams are using as a backing data bus. Kafka can also be used here, however PWS does not have a Kafka service. So Rabbit it is.
 
+A note on Queues in Spring Cloud Data Flow. If you are using multiple brokers (ie: Rabbit MQ and Kafka or two Rabbit MQ), there is a bit of extra configuration.
+
+https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#spring-cloud-dataflow-stream-multi-binder
+
+To make our lives simpler we will be using the same RabbitMQ instance for our message-producer to write too as well as SCDF to use as a backing message bus.
+
 ### Installing The Transformer
 
 The are a few ways to get the binary for the component on to the server. For this example the jar has been added to github. The link to this binary can be used in the URI.
@@ -73,12 +86,23 @@ The following registers the component in SCDF's Data Server running in PWS.
 
 ```shell
 
-dataflow:>app register --name xml-json-enricher --type processor --uri https://github.com/lshannon/message-stream-processing/blob/master/soap-to-json-transformer-0.1.0.jar
+dataflow:>app register --name soap-to-json-transformer --type processor --uri https://github.com/lshannon/message-stream-processing/blob/master/soap-to-json-transformer-0.1.0.jar
 Successfully registered application 'processor:soap-to-json-transformer'
+
 
 ```
 For more on registering components:
 https://docs.spring.io/spring-cloud-dataflow/docs/1.2.1.RELEASE/reference/html/spring-cloud-dataflow-register-apps.html
+
+### Consuming The Message Into The Custom Processor
+
+To get the messages being produced to the RabbitMQ Queue, create the following stream:
+
+```shell
+
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+
+```
 
 ## Routing Messages
 
