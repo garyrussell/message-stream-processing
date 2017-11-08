@@ -55,10 +55,20 @@ Simply create a free instance of the CloudAMQP broker from the Marketplace:
 
 ```shell
 
-cf create-service cloudamqp lemur messages
+cf create-service cloudamqp tiger scdf-rabbitmq-queue
 
 ```
 Similar to local, once the application is connected it will create the necessary queues and exchanges.
+
+We will use this for both the data bus of SCDF and our queue for our SOAP messages.
+
+Lets test by creating a stream that writes the messages in the RabbitMQ 'messages' queue to the log.
+
+```shell
+
+create rabbittest --definition "rabbit --queues=messages | log" --deploy
+
+```
 
 ## Transforming From SOAP to JSON
 
