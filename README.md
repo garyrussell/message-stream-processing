@@ -68,7 +68,9 @@ Lets test by creating a stream that writes the messages in the RabbitMQ 'message
 
 ```shell
 
-create rabbittest --definition "rabbit --queues=messages | log" --deploy
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+stream create rabbittest --definition "rabbit --queues=messages | log" --deploy
 
 ```
 
