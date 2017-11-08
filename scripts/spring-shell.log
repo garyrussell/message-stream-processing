@@ -1,0 +1,3 @@
+// dataflow 1.2.0.RELEASE log opened at 2017-11-07 19:09:03
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven

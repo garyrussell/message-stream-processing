@@ -6,4 +6,4 @@ applications:
   instances: 1
   path: build/libs/gs-producing-web-service-0.1.0.jar
   services:
-   - messages
+   - scdf-rabbitmq-queue
