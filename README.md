@@ -16,11 +16,13 @@ The components involved, and where they are deployed within the Cloud are as fol
 
 ### Spring Cloud Data Flow Server
 
-To set up the Spring Cloud Data Flow (SCDF) Server, please follow the steps in this repo:
+To set up the Spring Cloud Data Flow (SCDF) Server, I modified the scripts found in this project:
 
 https://github.com/lshannon/spring-cloud-data-flow-setup
 
-We will use the Server to create and manage streams.
+Similar scripts can be found in the 'scripts' folder of this project.
+
+To run this you will need a paid subscription on PWS and a CloudAMQP plan that is at least as robust as 'Tiger'.
 
 ### Message Production
 
