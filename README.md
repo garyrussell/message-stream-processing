@@ -94,9 +94,13 @@ To make our lives simpler we will be using the same RabbitMQ instance for our me
 
 ### Installing The Transformer
 
-The are a few ways to get the binary for the component on to the server. For this example the jar has been added to github. The link to this binary can be used in the URI.
+For convience the 'simple-message-processor' has been packaged in a Spring Boot application. Deploying this application into PWS will give a convient place load the processor from.
 
-The following registers the component in SCDF's Data Server running in PWS.
+For a more robust solution for managing such modules, Spring Cloud Skipper should be considered:
+
+https://github.com/spring-cloud/spring-cloud-skipper
+
+Once the 'processor-repository' application has been deployed the link to get the binary from can be found on the root page of the application. Using this uri, the component can be registered using the SCDF shell like this:
 
 ```shell
 
