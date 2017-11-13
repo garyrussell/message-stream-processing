@@ -125,7 +125,7 @@ To get the messages being produced to the RabbitMQ Queue, create the following s
 
 ```shell
 
-stream create rabbittest --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
 
 ```
 This gets messages out of the queue, transformed and enriched and then sent to a log to verify they are there.
