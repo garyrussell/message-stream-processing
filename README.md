@@ -100,11 +100,18 @@ The following registers the component in SCDF's Data Server running in PWS.
 
 ```shell
 
-dataflow:>app register --name soap-to-json-transformer --type processor --uri https://github.com/lshannon/message-stream-processing/raw/master/soap-to-json-transformer-0.1.0.jar
-Successfully registered application 'processor:soap-to-json-transformer'
-
+dataflow:>app register --name simple-message-processor --type processor --uri https://<application name>.cfapps.io/simple-message-processor.jar
+Successfully registered application 'processor:simple-message-processor'
 
 ```
+Should you wish to remove it:
+
+```shell
+
+app unregister --name simple-message-processor --type processor
+
+```
+
 For more on registering components:
 https://docs.spring.io/spring-cloud-dataflow/docs/1.2.1.RELEASE/reference/html/spring-cloud-dataflow-register-apps.html
 
@@ -114,9 +121,10 @@ To get the messages being produced to the RabbitMQ Queue, create the following s
 
 ```shell
 
-stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+stream create rabbittest --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
 
 ```
+This gets messages out of the queue, transformed and enriched and then sent to a log to verify they are there.
 
 ## Routing Messages
 
