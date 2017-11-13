@@ -133,6 +133,21 @@ This gets messages out of the queue, transformed and enriched and then sent to a
 
 ## Routing Messages
 
+Do groovy based routing, host the script in the processor-repo:
+
+https://github.com/spring-cloud-stream-app-starters/router/blob/master/spring-cloud-starter-stream-sink-router/README.adoc
+
+
+
 ## Configuring Routing Behavior
+
+Get the message here (but use rabbit)
+
+stream create f --definition ":foo > transform --expression=payload+'-foo' | log" --deploy
+stream create b --definition ":bar > transform --expression=payload+'-bar' | log" --deploy
+stream create r --definition "http | router --expression=payload.contains('a')?'foo':'bar'" --deploy
+
+TODO:
+Trim the names on the org and space
 
 
