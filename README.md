@@ -73,6 +73,7 @@ app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
 stream create rabbittest --definition "rabbit --queues=messages | log" --deploy
 
 ```
+A note routes need be less than 63 characters. Ensure not to put larger Stream names as SCDF will add to them.
 
 ## Transforming From SOAP to JSON
 
