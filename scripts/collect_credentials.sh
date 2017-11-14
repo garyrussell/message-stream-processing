@@ -21,6 +21,17 @@
   echo "Credentials we will be using. Username: $USERNAME Password: ******** Organization: $ORG Space: $SPACE"
   echo ""
 
+  #trim the org and space name
+  . trim_names.sh
+
+  BASE_NAME=$(trimname $ORG $SPACE)
+
+  # Create the names for the services and application
+  ADMIN="$BASE_NAME-dataflow-server"
+  REDIS="$BASE_NAME-scdf-redis"
+  RABBIT="scdf-rabbitmq-queue"
+  MYSQL="$BASE_NAME-scdf-mysql"
+
   echo "Are these credentials correct? (Type 'Y' to proceed)"
   read CONFIRMATION
   if [ "$CONFIRMATION" != "Y" ]; then

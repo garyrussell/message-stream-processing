@@ -7,11 +7,6 @@ echo "To delete the SCDF Server and all its services we will need credentials to
 #Run script to collection credentails
 . collect_credentials.sh
 
-# Create the names for the services and application
-ADMIN="$ORG$SPACE-dataflow-server"
-REDIS="$ORG$SPACE-scdf-redis"
-MYSQL="$ORG$SPACE-scdf-mysql"
-
 #Review the commands to Run
 echo "The following commands will be ran to set up your Server:"
 echo "cf delete $ADMIN -f"

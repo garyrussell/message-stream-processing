@@ -11,12 +11,6 @@ echo "This samples requires a more robust RabbitMQ plan (ie: Tiger)"
 #Run script to collection credentails
 . collect_credentials.sh
 
-# Create the names for the services and application
-ADMIN="$ORG$SPACE-dataflow-server"
-REDIS="$ORG$SPACE-scdf-redis"
-RABBIT="scdf-rabbitmq-queue"
-MYSQL="$ORG$SPACE-scdf-mysql"
-
 echo "The Data Server will be called: $ADMIN "
 echo "Redis Serivce: $REDIS"
 echo "Rabbit Service: $RABBIT"
