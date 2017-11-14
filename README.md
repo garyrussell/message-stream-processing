@@ -70,7 +70,7 @@ Lets test by creating a stream that writes the messages in the RabbitMQ 'message
 
 dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
 app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
-stream create rabbittest --definition "rabbit --queues=messages | log" --deploy
+stream create luke1 --definition "rabbit --queues=messages | log" --deploy
 
 ```
 A note routes need be less than 63 characters. Ensure not to put larger Stream names as SCDF will add to them.
@@ -95,13 +95,82 @@ To make our lives simpler we will be using the same RabbitMQ instance for our me
 
 ### Installing The Transformer
 
-For convience the 'simple-message-processor' has been packaged in a Spring Boot application. Deploying this application into PWS will give a convient place load the processor from.
+The transformer code is located in the 'simple-message-processor' project. This custom component performs:
 
-For a more robust solution for managing such modules, Spring Cloud Skipper should be considered:
+1. Transform message to JSON
+2. Adding routing key to JSON
+
+This can be found in the Process component.
+
+```java
+
+  @PostConstruct
+	private void init() {
+		routingKeys = new ArrayList<String>();
+		routingKeys.add("java");
+		routingKeys.add(".net");
+		routingKeys.add("log");
+		routingKeys.add("db");
+		routingKeys.add("file");
+		mapper = new ObjectMapper();
+	}
+
+	@StreamListener(Processor.INPUT)
+	@Output(Processor.OUTPUT)
+	public String process(String message) {
+		ProcessedMessage messageObj = new ProcessedMessage(message, getRoutingKey());
+		String json = null;
+		log.debug("Got a message to process: " + message);
+		try {
+			json = mapper.writeValueAsString(messageObj);
+		} catch (JsonProcessingException e) {
+			log.error("Unable to convert: " + messageObj.toString() + " to JSON");
+		}
+		log.debug("Processing Complete. Resulting JSON: " + json);
+		return json;
+	}
+
+	private String getRoutingKey() {
+		int rnd = new Random().nextInt(routingKeys.size());
+		return routingKeys.get(rnd);
+	}
+
+
+```
+
+This application is built and packaged using maven. Part of the build process is to copy this artifact to the 'processor-repository' static folder.
+
+From inside the folder run:
+
+```shell
+
+./mvnw clean package
+
+```
+
+You will see the following line where the copy is happening.
+
+```shell
+
+[copy] Copying 1 file to /Users/lshannon/Documents/message-stream-processing/processor-repository/src/main/resources/static
+
+```
+To compile the 'processor-repository' run the maven clean package in the 'processor-repository'.
+
+```shell
+
+./mvnw clean package
+
+```
+While in this folder, log into PCF and then run a cf push.
+
+Once the 'processor-repository' is running in PWS, hit the root page of the application to get the links for the processor and groovy routing rules (routing explained below).
+
+For a more robust solution for managing custom modules, Spring Cloud Skipper should be considered:
 
 https://github.com/spring-cloud/spring-cloud-skipper
 
-Once the 'processor-repository' application has been deployed the link to get the binary from can be found on the root page of the application. Using this uri, the component can be registered using the SCDF shell like this:
+Once the 'processor-repository' is running in PWS, the custom component can be registered in the SCDF shell with the following command.
 
 ```shell
 
@@ -109,7 +178,7 @@ dataflow:>app register --name simple-message-processor --type processor --uri ht
 Successfully registered application 'processor:simple-message-processor'
 
 ```
-Should you wish to remove it:
+Should you wish to remove it, in the SCDF shell run the following:
 
 ```shell
 
@@ -122,32 +191,56 @@ https://docs.spring.io/spring-cloud-dataflow/docs/1.2.1.RELEASE/reference/html/s
 
 ### Consuming The Message Into The Custom Processor
 
-To get the messages being produced to the RabbitMQ Queue, create the following stream:
+To test the custom processor, create a stream that routes the messages from the 'simple-message-producer' through the processor and into the logs.
 
 ```shell
 
 stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
 
 ```
-This gets messages out of the queue, transformed and enriched and then sent to a log to verify they are there.
+If this successfully works the logs will contain the following:
+
+```shell
+
+
+
+```
 
 ## Routing Messages
+
+Next we will route each of the messages to its own rabbit queue. We will use the Router processor for this.
 
 Do groovy based routing, host the script in the processor-repo:
 
 https://github.com/spring-cloud-stream-app-starters/router/blob/master/spring-cloud-starter-stream-sink-router/README.adoc
 
+```shell
 
 
-## Configuring Routing Behavior
+stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | router --script=https://processor-repository-yeastlike-conjugator.cfapps.io/groovy-routing-rules.groovy" --deploy
 
-Get the message here (but use rabbit)
+````
 
-stream create f --definition ":foo > transform --expression=payload+'-foo' | log" --deploy
-stream create b --definition ":bar > transform --expression=payload+'-bar' | log" --deploy
-stream create r --definition "http | router --expression=payload.contains('a')?'foo':'bar'" --deploy
+## Consuming the Routed Streams
 
-TODO:
-Trim the names on the org and space
+To consume the routed messages, we need to create a stream for each queue.
+
+For each queue created by the router we will create a stream to consume it and send it to the correct sink.
+
+These are created by running the following commands in the SCDF shell:
+
+```shell
+
+stream create java-consume --definition "rabbit --queues=java | tcp --host=https://javaconsumer/endpoint" --deploy
+
+stream create net-consume --definition "rabbit --queues=net | tcp --host=https://.netconsumer/endpoint" --deploy
+
+stream create log-consume --definition "rabbit --queues=log | log" --deploy
+
+stream create db-consume --definition "rabbit --queues=db | jdbc --password=0W}PMhbn --driver-class-name=sadasdasd --username=asdsad --schema=sadsd --url=asd" --deploy
+
+stream create file-consume -definition "rabbit --queues=file | ftp --filename-expression=asdas --password=sadsadasd --host=ssadd --username=asdsd" --deploy
+
+```
 
 
