@@ -14,9 +14,10 @@ MYSQL="$ORG$SPACE-scdf-mysql"
 
 #Review the commands to Run
 echo "The following commands will be ran to set up your Server:"
+echo "cf delete $ADMIN -f"
 echo "cf delete-service $REDIS -f"
 echo "cf delete-service $MYSQL -f"
-echo "cf delete $ADMIN -f"
+echo "cf delete-orphaned-routes -f"
 echo ""
 
 echo "Do you wish to run these commands (there will be a charge for all these services in PWS)? (Type 'Y' to proceed)"
@@ -36,6 +37,10 @@ echo ""
 
 echo "Deleting the MySql Service"
 	cf delete-service $MYSQL -f
+echo ""
+
+echo "Removing Orphaned Routes"
+  cf delete $ADMIN -f
 echo ""
 
 echo "Clean Up Completed"

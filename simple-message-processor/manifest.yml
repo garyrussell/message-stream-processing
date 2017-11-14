@@ -1,0 +1,9 @@
+---
+applications:
+- name: simple-mesage-processor
+  memory: 1024M
+  buildpack: java_buildpack
+  random-route: true
+  path: target/simple-message-processor.jar
+  services:
+   - scdf-rabbitmq-queue

@@ -1,0 +1,9 @@
+---
+applications:
+- name: simple-message-producer
+  random-route: true
+  memory: 1G
+  instances: 1
+  path: target/simple-message-producer.jar
+  services:
+   - scdf-rabbitmq-queue

@@ -1,0 +1,73 @@
+// dataflow 1.2.0.RELEASE log opened at 2017-11-08 19:42:55
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+app register --name soap-to-json-transformer --type processor --uri https://github.com/lshannon/message-stream-processing/raw/master/soap-to-json-transformer-0.1.0.jar
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+stream destroy --name message-ingest
+stream create message-ingest --definition "rabbit --queues=messages | soap-to-json-transformer | log" --deploy
+stream destroy --name message-ingest
+stream create rabbittest --definition "rabbit --queues=messages | log" --deploy
+// [failed] stream destroy --name message-ingest
+stream list
+stream destroy --name rabbittest
+app register --name simple-message-processor --type processor --uri https://processor-repository-yeastlike-conjugator.cfapps.io/simple-message-processor.jar
+// [failed] stream create rabbittest --definition "rabbit --queues=messages | simple-message-processor" --deploy
+stream create rabbittest --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream destroy --name rabbittest
+app unregister --name simple-message-processor --type processor 
+// [failed] stream create rabbittest --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+app register --name simple-message-processor --type processor --uri https://processor-repository-yeastlike-conjugator.cfapps.io/simple-message-processor.jar
+stream create rabbittest --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+app unregister --name simple-message-processor --type processor
+stream destroy --name rabbittest
+// [failed] app unregister --name simple-message-processor --type processor
+stream list
+app register --name simple-message-processor --type processor --uri https://processor-repository-yeastlike-conjugator.cfapps.io/simple-message-processor.jar
+stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream list
+stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream create --name processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream create --name processor-test --definition "rabbit --queues=messages | log" --deploy
+stream create --name ticktock --definition "time | log"
+stream create luketicktock --definition "time | log" --deploy
+stream list
+stream destroy --name ticktock
+stream destroy --name luketicktock
+stream list
+stream create luketicktock --definition "time | log" --deploy
+stream list
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+app register --name simple-message-processor --type processor --uri https://processor-repository-yeastlike-conjugator.cfapps.io/simple-message-processor.jar
+stream create --name processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+app list
+stream list
+stream destroy --name processor-test
+stream create --name ticktockluke2017 --definition "time | log" --deploy
+app list
+stream list
+stream list
+app import --uri http://bit.ly/Avogadro-SR1-stream-applications-rabbit-maven
+stream list
+stream destroy --name ticktock-big-test-partytime
+stream create --name ticktockluke2017No --definition "time | log" --deploy
+stream list
+exit
+// dataflow 1.2.0.RELEASE log closed at 2017-11-13 17:49:56
+// dataflow 1.2.0.RELEASE log opened at 2017-11-13 18:01:15
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+app info source:time
+stream create --name luke1 --definition "time | log" --deploy
+stream list
+runtime apps 
+stream destroy --name luke1
+app register --name simple-message-processor --type processor --uri https://processor-repository-yeastlike-conjugator.cfapps.io/simple-message-processor.jar
+stream create --name processor-test --definition ":messages > simple-message-processor | log" --deploy
+stream destroy --name processor-test
+stream create --name luke1 --definition ":messages > simple-message-processor | log" --deploy
+stream destroy --name luke1
+stream create luke1 --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream destroy luke1
+stream list
+stream list
