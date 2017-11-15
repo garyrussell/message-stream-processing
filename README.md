@@ -377,14 +377,17 @@ Now we can set up the message routing.
 
 ## Routing Messages
 
-Do do this we will use the rabbit sink of Spring Cloud Data Flow and the 'routingKey' field we added to the message with the 'simple-message-processor'.
+To do this we will take the messages, pass it through the processor where we add the 'routingKey' and final send it to a Rabbit Exchange named the same as that routing key (these were created in the previous step).
 
 ```shell
 
 stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey') --exchange-expression=#jsonPath(payload,'$.routingKey')" --deploy
 
 ````
-The result of this stream will be to write to exchanges that match the 'routingKey' of the JSON. There names will be familiar as these are the same Queue/Exchanges specified in the named destinations above.
+
+The result of this will be more Exchanges (and Queues) created in Rabbit MQ and more Applications to write messages to and from these Queues.
+
+
 
 
 
