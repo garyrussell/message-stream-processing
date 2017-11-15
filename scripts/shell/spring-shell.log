@@ -203,3 +203,12 @@ exit
 // dataflow 1.2.0.RELEASE log opened at 2017-11-15 13:01:40
 dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
 app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+stream list
+stream create --name j123 --definition ":java > log" --deploy
+stream create --name l123 --definition ":log > log" --deploy
+stream create --name d123 --definition ":db > log" --deploy
+stream create --name f123 --definition ":file > log" --deploy
+stream list
+stream list
+stream list
+stream list
