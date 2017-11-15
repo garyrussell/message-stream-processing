@@ -232,15 +232,11 @@ These are created by running the following commands in the SCDF shell:
 
 ```shell
 
-stream create java --definition "rabbit --queues=java | log" --deploy
-
-stream create .net --definition "rabbit --queues=net | log" --deploy
-
-stream create log --definition "rabbit --queues=log | log" --deploy
-
-stream create db --definition "rabbit --queues=db | log" --deploy
-
-stream create file -definition "rabbit --queues=file | log" --deploy
+stream create --name j123 --definition ":java > log" --deploy
+stream create --name n123 --definition ":net > log" --deploy
+stream create --name l123 --definition ":log > log" --deploy
+stream create --name d123 --definition ":db > log" --deploy
+stream create --name f123 --definition ":file > log" --deploy
 
 ```
 
@@ -257,8 +253,5 @@ stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-p
 
 ````
 The result of this stream will be to create a queue in Rabbit for each unique 'routingKey' and then send the messages to the queue.
-
-
-```
 
 
