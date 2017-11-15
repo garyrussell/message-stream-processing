@@ -85,6 +85,8 @@ https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#
 
 To keep things simple for this demo we will be using one Rabbit MQ service for everything.
 
+Upon starting/restarting this application it will fill the Rabbit Exchange called 'messages' with 10,000 text strings. Each are lines from various movies or TV shows. Worthless data...or is it?
+
 
 #### Setting Up RabbitMQ Locally (Only if you wish to build the message-producer)
 
