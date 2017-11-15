@@ -226,7 +226,7 @@ Do do this we will use the rabbit sink of Spring Cloud Data Flow and the 'routin
 
 ```shell
 
-stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'routingKey')" --deploy
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy
 
 ````
 The result of this stream will be to create a queue in Rabbit for each unique 'routingKey' and then send the messages to the queue.
