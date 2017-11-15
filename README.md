@@ -393,7 +393,11 @@ We also have a lot of applications created in the Apps Manager.
 
 ![alt text](images/complete-stream-exchanges.png "All applications")
 
-To run this sample we need to start the message flow. This can be done by starting/restarting the 'simple-message-producer' application. Once its back up we will see the messages hitting the 'message' exchange.
+To run this sample we need to start the message flow. This can be done by starting/restarting the 'simple-message-producer' application.
+
+![alt text](images/restart-simple-message-producer.png "All Exchanges")
+
+Once its back up we will see the messages hitting the 'message' exchange.
 
 After a short time messages will start showing up in the respective Exchanges at the end of the line.
 
