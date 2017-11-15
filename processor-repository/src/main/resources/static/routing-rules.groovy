@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 println("Groovy processing payload '" + payload + "'");
 
 def jsonSlurper = new JsonSlurper()

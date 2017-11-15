@@ -37,7 +37,7 @@ public class Process {
 	private void init() {
 		routingKeys = new ArrayList<String>();
 		routingKeys.add("java");
-		routingKeys.add(".net");
+		routingKeys.add("net");
 		routingKeys.add("log");
 		routingKeys.add("db");
 		routingKeys.add("file");
@@ -55,7 +55,7 @@ public class Process {
 		} catch (JsonProcessingException e) {
 			log.error("Unable to convert: " + messageObj.toString() + " to JSON");
 		}
-		log.debug("Processing Complete. Resulting JSON: " + json);
+		log.info("Processing Complete. Resulting JSON: " + json);
 		return json;
 	}
 

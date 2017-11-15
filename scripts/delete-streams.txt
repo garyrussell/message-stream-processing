@@ -1,0 +1,6 @@
+stream destroy --name j123
+stream destroy --name n123
+stream destroy --name l123
+stream destroy --name d123
+stream destroy --name f123
+stream destroy --name lws1

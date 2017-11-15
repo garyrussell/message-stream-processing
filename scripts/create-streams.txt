@@ -1,0 +1,6 @@
+stream create --name j123 --definition ":java > log" --deploy
+stream create --name n123 --definition ":net > log" --deploy
+stream create --name l123 --definition ":log > log" --deploy
+stream create --name d123 --definition ":db > log" --deploy
+stream create --name f123 --definition ":file > log" --deploy
+stream create --name lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy

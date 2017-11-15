@@ -71,3 +71,135 @@ stream create luke1 --definition "rabbit --queues=messages | simple-message-proc
 stream destroy luke1
 stream list
 stream list
+// dataflow 1.2.0.RELEASE log opened at 2017-11-14 14:57:11
+// dataflow 1.2.0.RELEASE log opened at 2017-11-14 14:57:24
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | router --script=https://processor-repository-yeastlike-conjugator.cfapps.io/groovy-routing-rules.groovy" --deploy
+app list
+stream list
+stream destroy --name processor-test
+stream create lws1 --definition "rabbit --queues=messages | simple-message-processor | router --script=https://processor-repository-yeastlike-conjugator.cfapps.io/groovy-routing-rules.groovy" --deploy
+stream list
+stream destroy --name lws1
+stream create lws1 --definition "rabbit --queues=messages | simple-message-processor | router --script=https://processor-repository-yeastlike-conjugator.cfapps.io/routing-rules.groovy" --deploy
+stream destroy --name lws1
+stream create lws1 --definition "rabbit --queues=messages | simple-message-processor | router --script=https://processor-repository-yeastlike-conjugator.cfapps.io/routing-rules.groovy" --deploy
+stream destroy --name lws1
+// [failed] stream create lws1 --definition "rabbit --queues=messages | simple-message-processor | --routing-key=#jsonPath(payload,'routingKey')" --deploy
+// [failed] stream create lws1 --definition "rabbit --queues=messages | simple-message-processor | rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
+stream create lws1 --definition "messageSource: rabbit --queues=messages | simple-message-processor | messageRouter: rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
+stream list
+stream destroy --name lws1
+stream create lws1 --definition "messageSource: rabbit --queues=messages | simple-message-processor | messageRouter: rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
+stream destroy --name lws1
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
+stream list
+stream list
+stream destroy --name lws1
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
+app info sink:rabbit
+stream destroy --name lws1
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'routingKey')" --deploy
+stream destroy --name lws1
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy
+stream destroy --name lws1
+// [failed] stream destroy --name lws1
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy
+stream destroy --name lws1
+stream create java --definition "rabbit --queues=java | log" --deploy
+// [failed] stream create .net --definition "rabbit --queues=net | log" --deploy
+stream create log --definition "rabbit --queues=log | log" --deploy
+stream create db --definition "rabbit --queues=db | log" --deploy
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream list
+stream destroy --name db
+stream destroy --name java
+stream destroy --name log
+stream destroy --name lws1
+stream create --definition ":java > log" --name j1 --deploy
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy
+stream list
+stream destroy --name j1
+stream destroy --name lws1
+stream create --definition ":java > log" --name j1 --deploy
+stream create --name lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey') --exchange-expression=#jsonPath(payload,'$.routingKey')" --deploy
+stream destroy --name j1
+stream destroy --name lws1
+exit
+// dataflow 1.2.0.RELEASE log closed at 2017-11-15 13:01:11
+// dataflow 1.2.0.RELEASE log opened at 2017-11-15 13:01:17
+exit
+// dataflow 1.2.0.RELEASE log closed at 2017-11-15 13:01:30
+// dataflow 1.2.0.RELEASE log opened at 2017-11-15 13:01:40
+dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
+app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
