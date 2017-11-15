@@ -220,17 +220,16 @@ If this successfully works the logs will contain the following:
 
 ## Routing Messages
 
-Next we will route each of the messages to its own rabbit queue. We will use the Router processor for this.
+Next we will route each of the messages to its own rabbit queue.
 
-Do groovy based routing, host the script in the processor-repo:
-
-https://github.com/spring-cloud-stream-app-starters/router/blob/master/spring-cloud-starter-stream-sink-router/README.adoc
+Do do this we will use the rabbit sink of Spring Cloud Data Flow and the 'routingKey' field we added to the message with the 'simple-message-processor'.
 
 ```shell
 
-stream create lws1 --definition "messageSource: rabbit --queues=messages | simple-message-processor | messageRouter: rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'routingKey')" --deploy
 
 ````
+The result of this stream will be to create a queue in Rabbit for each unique 'routingKey' and then send the messages to the queue.
 
 ## Consuming the Routed Streams
 
