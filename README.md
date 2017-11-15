@@ -341,21 +341,39 @@ Here are the named destinations.
 
 ```shell
 
-stream create --name j123 --definition ":java > log" --deploy
-stream create --name n123 --definition ":net > log" --deploy
-stream create --name l123 --definition ":log > log" --deploy
-stream create --name d123 --definition ":db > log" --deploy
-stream create --name f123 --definition ":file > log" --deploy
+dataflow:>stream create --name j123 --definition ":java > log" --deploy
+Created new stream 'j123'
+Deployment request has been sent
+dataflow:>stream create --name l123 --definition ":log > log" --deploy
+Created new stream 'l123'
+Deployment request has been sent
+dataflow:>stream create --name d123 --definition ":db > log" --deploy
+Created new stream 'd123'
+Deployment request has been sent
+dataflow:>stream create --name f123 --definition ":file > log" --deploy
+dataflow:>stream list
+╔═══════════╤═════════════════╤════════════════════════════════════════╗
+║Stream Name│Stream Definition│                 Status                 ║
+╠═══════════╪═════════════════╪════════════════════════════════════════╣
+║d123       │:db > log        │All apps have been successfully deployed║
+║f123       │:file > log      │All apps have been successfully deployed║
+║j123       │:java > log      │All apps have been successfully deployed║
+║l123       │:log > log       │All apps have been successfully deployed║
+╚═══════════╧═════════════════╧════════════════════════════════════════╝
+
 
 ```
-In the first definition, j123, a Rabbit Exchange will be created with a Queue bound to it
+For each stream a Exchange is created and Queues created and bound to that Exchange.
 
+![alt text](images/consumer-queues-exchanges.png "Rabbit Manager")
 
+SCDF also creates Apps in PCF to handle the moving of messages from these Exchanges.
 
+![alt text](images/consumer-streams-apps.png "Rabbit Manager")
+
+Now we can set up the message routing.
 
 ## Routing Messages
-
-Next we will route each of the messages to its own rabbit queue.
 
 Do do this we will use the rabbit sink of Spring Cloud Data Flow and the 'routingKey' field we added to the message with the 'simple-message-processor'.
 
