@@ -228,8 +228,7 @@ https://github.com/spring-cloud-stream-app-starters/router/blob/master/spring-cl
 
 ```shell
 
-
-stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | router --script=https://processor-repository-yeastlike-conjugator.cfapps.io/groovy-routing-rules.groovy" --deploy
+stream create lws1 --definition "messageSource: rabbit --queues=messages | simple-message-processor | messageRouter: rabbit --routing-key=#jsonPath(payload,'routingKey')" --deploy
 
 ````
 
