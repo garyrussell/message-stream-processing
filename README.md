@@ -125,8 +125,7 @@ Part of the Service in creating the Rabbit MQ Service is to create the manager.
 
 This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are created.
 
-
-The 'simple-message-producer' and SCDF itself will create the Rabbit Exchanges and Queues it required at run time.
+The 'simple-message-producer' and SCDF itself will create the Rabbit Exchanges and Queues it required at run-time.
 
 No configuration of the Rabbit Service is required for this demo.
 
@@ -188,22 +187,16 @@ To do this we will need to:
 
 To register the component we will need to host it somewhere. This is where the 'processor-repository' comes in. More on this later.
 
-### Simple Message Processor
+### Simple Message Processor Functionality
 
-This simple Spring Boot application is going to grab the messages from Rabbit MQ that the 'simple-message-producer' writes and transform and enrich them.
+This simple Spring Boot application is going to grab the messages from Rabbit MQ that the 'simple-message-producer' writes to Rabbit, transforms and enrich them and then passes the message to the routing components of the stream.
 
-
-
-To make our lives simpler we will be using the same RabbitMQ instance for our message-producer to write too as well as SCDF to use as a backing message bus.
-
-### Installing The Transformer
-
-The transformer code is located in the 'simple-message-processor' project. This custom component performs:
+This component:
 
 1. Transform message to JSON
-2. Adding routing key to JSON
+2. Adds routing key to JSON
 
-This can be found in the Process component.
+This is done in the Process.java file.
 
 ```java
 
@@ -241,9 +234,13 @@ This can be found in the Process component.
 
 ```
 
-This application is built and packaged using maven. Part of the build process is to copy this artifact to the 'processor-repository' static folder.
+As previously mentioned, the output of this component is the Rabbit Service SCDF is bound too.
 
-From inside the folder run:
+This application is built and packaged using maven. Part of the build process is to copy this artifact to the 'processor-repository' static folder. The 'process-repository' is a simple Spring Boot application that provides a http end point to access the 'simple-message-processor' jar.
+
+#### Compiling The 'simple-message-processor'
+
+From inside the 'simple-message-processor' root folder run:
 
 ```shell
 
@@ -258,6 +255,10 @@ You will see the following line where the copy is happening.
 [copy] Copying 1 file to /Users/lshannon/Documents/message-stream-processing/processor-repository/src/main/resources/static
 
 ```
+### Publishing The 'simple-message-process' with the 'processor-repository' Application
+
+The 'simple-message-process' will be made available to stream definitions by serving it from a Spring Boot application running in PWS call the 'processor-repository'.
+
 To compile the 'processor-repository' run the maven clean package in the 'processor-repository'.
 
 ```shell
@@ -265,15 +266,17 @@ To compile the 'processor-repository' run the maven clean package in the 'proces
 ./mvnw clean package
 
 ```
-While in this folder, log into PCF and then run a cf push.
+In the root folder is a manifest.yml file that can be used when pushing to PWS.
 
-Once the 'processor-repository' is running in PWS, hit the root page of the application to get the links for the processor and groovy routing rules (routing explained below).
+Once the 'processor-repository' is running in PWS, hit the root page of the application to page of tips.
 
 For a more robust solution for managing custom modules, Spring Cloud Skipper should be considered:
 
 https://github.com/spring-cloud/spring-cloud-skipper
 
-Once the 'processor-repository' is running in PWS, the custom component can be registered in the SCDF shell with the following command.
+#### Registering The Custom Component
+
+Now custom component can be registered in the SCDF shell with the following command.
 
 ```shell
 
@@ -298,9 +301,12 @@ To test the custom processor, create a stream that routes the messages from the 
 
 ```shell
 
-stream create processor-test --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
+stream create pt1 --definition "rabbit --queues=messages | simple-message-processor | log" --deploy
 
 ```
+
+**NOTE:** Keep stream names short. Streams become apps in PCF (SCDF will generate the names) and PCF has a 63 character limit on route names.
+
 If this successfully works the logs will contain the following:
 
 ```shell
@@ -323,15 +329,15 @@ If this successfully works the logs will contain the following:
 
 ## Consuming the Routed Streams
 
-Lets start routing these messages. To do this we will set up the consumers first, in doing so we will set up the Rabbit MQ exchanges and queues to handle the messages we route.
+Lets start routing these messages. For now we will route to log files.
+
+To do this we will set up the consumers first, in doing so we will set up the Rabbit MQ exchanges and queues to handle the messages we route.
 
 This is done in SCDF using named destinations:
 
 https://docs.spring.io/spring-cloud-dataflow/docs/1.2.3.RELEASE/reference/htmlsingle/#spring-cloud-dataflow-stream-dsl-named-destinations
 
-For each routingKey that our transformer will add, we will create a named destination. This will generate a Queue and Exchange.
-
-These are created by running the following commands in the SCDF shell:
+Here are the named destinations.
 
 ```shell
 
@@ -342,6 +348,9 @@ stream create --name d123 --definition ":db > log" --deploy
 stream create --name f123 --definition ":file > log" --deploy
 
 ```
+In the first definition, j123, a Rabbit Exchange will be created with a Queue bound to it
+
+
 
 
 ## Routing Messages
