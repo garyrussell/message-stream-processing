@@ -218,6 +218,31 @@ If this successfully works the logs will contain the following:
 
 ```
 
+## Consuming the Routed Streams
+
+Lets start routing these messages. To do this we will set up the consumers first, in doing so we will set up the Rabbit MQ exchanges and queues to handle the messages we route.
+
+This is done in SCDF using named destinations:
+
+https://docs.spring.io/spring-cloud-dataflow/docs/1.2.3.RELEASE/reference/htmlsingle/#spring-cloud-dataflow-stream-dsl-named-destinations
+
+For each routingKey that our transformer will add, we will create a named destination. This will generate a Queue and Exchange.
+
+These are created by running the following commands in the SCDF shell:
+
+```shell
+
+stream create java --definition "rabbit --queues=java | log" --deploy
+
+stream create .net --definition "rabbit --queues=net | log" --deploy
+
+stream create log --definition "rabbit --queues=log | log" --deploy
+
+stream create db --definition "rabbit --queues=db | log" --deploy
+
+stream create file -definition "rabbit --queues=file | log" --deploy
+
+
 ## Routing Messages
 
 Next we will route each of the messages to its own rabbit queue.
@@ -226,30 +251,11 @@ Do do this we will use the rabbit sink of Spring Cloud Data Flow and the 'routin
 
 ```shell
 
-stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey')" --deploy
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey') --exchange-expression=#jsonPath(payload,'$.routingKey')" --deploy
 
 ````
 The result of this stream will be to create a queue in Rabbit for each unique 'routingKey' and then send the messages to the queue.
 
-## Consuming the Routed Streams
-
-To consume the routed messages, we need to create a stream for each queue.
-
-For each queue created by the router we will create a stream to consume it and send it to the correct sink.
-
-These are created by running the following commands in the SCDF shell:
-
-```shell
-
-stream create java-consume --definition "rabbit --queues=java | tcp --host=https://javaconsumer/endpoint" --deploy
-
-stream create net-consume --definition "rabbit --queues=net | tcp --host=https://.netconsumer/endpoint" --deploy
-
-stream create log-consume --definition "rabbit --queues=log | log" --deploy
-
-stream create db-consume --definition "rabbit --queues=db | jdbc --password=0W}PMhbn --driver-class-name=sadasdasd --username=asdsad --schema=sadsd --url=asd" --deploy
-
-stream create file-consume -definition "rabbit --queues=file | ftp --filename-expression=asdas --password=sadsadasd --host=ssadd --username=asdsd" --deploy
 
 ```
 
