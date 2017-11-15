@@ -212,3 +212,5 @@ stream list
 stream list
 stream list
 stream list
+stream list
+stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-processor | r2: rabbit --routing-key-expression=#jsonPath(payload,'$.routingKey') --exchange-expression=#jsonPath(payload,'$.routingKey')" --deploy
