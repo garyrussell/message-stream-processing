@@ -242,6 +242,8 @@ stream create db --definition "rabbit --queues=db | log" --deploy
 
 stream create file -definition "rabbit --queues=file | log" --deploy
 
+```
+
 
 ## Routing Messages
 
