@@ -2,13 +2,26 @@
 
 ## Overview
 
-This demo shows how to process, enrich and route messages to different sinks.
+This demo shows how to process, enrich and route messages to different sinks using Spring Cloud Dataflows (SCDF):
+
+https://docs.spring.io/spring-cloud-dataflow/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-system-requirements
+
+In this sample we will demonstrate:
+
+1. Streams to capture data
+2. Custom components in a stream to transform and enrich messages
+3. Routing of messages to different sinks using named destinations
+4. Some of the Sinks SCDF offers
+
+### High Level Message Flow
+
+Messages are produced on the left and are sent to sinks on the right.
 
 ![alt text](dataflow.png "Flow Of Data")
 
-This demo is built on PWS (Pivotal Web Services). This is a Pivotal managed installation of Pivotal Cloud Foundry on AWS.
+This demo is built to run on PWS (Pivotal Web Services). This is a Pivotal managed installation of Pivotal Cloud Foundry on AWS.
 
-The components involved, and where they are deployed within the Cloud are as follows.
+The components involved (including SCDF itself), and where they are deployed within the Cloud are as follows.
 
 ![alt text](components.png "Components")
 
@@ -16,23 +29,66 @@ The components involved, and where they are deployed within the Cloud are as fol
 
 ### Spring Cloud Data Flow Server
 
-To set up the Spring Cloud Data Flow (SCDF) Server, I modified the scripts found in this project:
+Data flows in Streams. SCDF provides a server to create and manage these streams.
+
+To set up the SCDF Server, I modified the scripts found in this project:
 
 https://github.com/lshannon/spring-cloud-data-flow-setup
 
 Similar scripts can be found in the 'scripts' folder of this project.
 
-To run this you will need a paid subscription on PWS and a CloudAMQP plan that is at least as robust as 'Tiger'.
+To run this you will need a paid subscription on PWS and a CloudAMQP plan that is at least as robust as 'Tiger' as this sample heavily leverages Rabbit MQ. There is a month cost for such a plan:
+
+https://console.run.pivotal.io/marketplace/services/3ba9445c-c709-4153-a343-e4ff5807316a
+
+```shell
+
+cf create-service cloudamqp tiger rabbit-scdf-queue
+
+```
+
+As this sample leverages some of the useful behaviors in the SCDF Rabbit sources, sinks and designated channels, **this will only work with Rabbit MQ as the backing data bus**. 
 
 ### Message Production
 
-Our messages will be SOAP messages being published on to Rabbit MQ queue. They will come as a steady stream. To get this result we took the following code base and made a few tweaks for it to write its SOAP Objects into a RabbitMQ exchange:
+Our messages will be unstructured texts messages being published on to Rabbit MQ queue. They will come as a steady stream.
 
-https://spring.io/guides/gs/producing-web-service/
+The application that produces them is in the 'simple-message-producer' folder. This is a simple Spring Boot application that will write messages to a Rabbit MQ Exchange upon start up.
+
+To compile this you will need a RabbitMQ running locally (see below). Compilation can be done using the maven wrapper at the root of the application folder.
+
+```shell
+
+./mvnw clean package
+
+```
+Also in the root of the application folder is a manifest.yml file for deployment to PCF.
+
+```yaml
+
+---
+applications:
+- name: simple-message-producer
+  random-route: true
+  memory: 1G
+  instances: 1
+  path: target/simple-message-producer.jar
+  services:
+   - scdf-rabbitmq-queue
+
+```
+**NOTE:** It is bound to the same Rabbit MQ service SCDF is using. Do not change this as extra configuration is required to get SCDF and a step within a stream to use different instances of the same messaging service:
+
+https://docs.spring.io/spring-cloud-dataflow/docs/1.2.3.RELEASE/reference/htmlsingle/#spring-cloud-dataflow-global-properties
+
+For simplicity sake we will use the same Rabbit Service for everything.
+
+The 'simple-message-producer' will create the Exchanges and Queues it requires upon start up. No configuration of the Rabbit Service is required for this demo.
+
 
 #### Setting Up RabbitMQ Locally (Only if you wish to build the message-producer)
 
-To build the message-producer locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory. With a Mac installing Rabbit can be done using Brew:
+To build the 'simple-message-producer' locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory. With a Mac installing Rabbit can be done using Brew:
 
 ```shell
 
@@ -49,7 +105,8 @@ http://127.0.0.1:15672/
 
 (guest/guest)
 
-The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the message-producer.
+The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the 'simple-message-producer'.
+
 
 #### Setting Up RabbitMQ on PWS
 
@@ -62,18 +119,58 @@ cf create-service cloudamqp tiger scdf-rabbitmq-queue
 ```
 Similar to local, once the application is connected it will create the necessary queues and exchanges.
 
-We will use this for both the data bus of SCDF and our queue for our SOAP messages.
+Part of the Service in creating the Rabbit MQ Service is to create the manager.
 
-Lets test by creating a stream that writes the messages in the RabbitMQ 'messages' queue to the log.
+![alt text](rabbit-manager-view.png "Rabbit Manager")
+
+This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are create 
+
+### Connecting To SCDF via The Shell
+
+From within the 'script' folder of the run the following java command to launch a SCDF Shell Session.
 
 ```shell
 
-dataflow config server https://message-routingdevelopment-dataflow-server.cfapps.io
-app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
-stream create luke1 --definition "rabbit --queues=messages | log" --deploy
+➜  shell git:(master) ✗ pwd
+/Users/lshannon/Documents/message-stream-processing/scripts/shell
+➜  shell git:(master) ✗ java -jar spring-cloud-dataflow-shell-1.2.3.RELEASE.jar
+  ____                              ____ _                __
+ / ___| _ __  _ __(_)_ __   __ _   / ___| | ___  _   _  __| |
+ \___ \| '_ \| '__| | '_ \ / _` | | |   | |/ _ \| | | |/ _` |
+  ___) | |_) | |  | | | | | (_| | | |___| | (_) | |_| | (_| |
+ |____/| .__/|_|  |_|_| |_|\__, |  \____|_|\___/ \__,_|\__,_|
+  ____ |_|    _          __|___/                 __________
+ |  _ \  __ _| |_ __ _  |  ___| | _____      __  \ \ \ \ \ \
+ | | | |/ _` | __/ _` | | |_  | |/ _ \ \ /\ / /   \ \ \ \ \ \
+ | |_| | (_| | || (_| | |  _| | | (_) \ V  V /    / / / / / /
+ |____/ \__,_|\__\__,_| |_|   |_|\___/ \_/\_/    /_/_/_/_/_/
+
+1.2.3.RELEASE
+
+Welcome to the Spring Cloud Data Flow shell. For assistance hit TAB or type "help".
+server-unknown:>
 
 ```
-A note routes need be less than 63 characters. Ensure not to put larger Stream names as SCDF will add to them.
+Next we will connect to the SCDF server in the previous step. Your server name will be based on your Org and Space.
+
+```shell
+
+dataflow config server https://<scdf server route>.cfapps.io
+
+```
+Next we can load all of the Sources, Sinks and Transformers SCDF provides out of the box.
+
+```shell
+
+dataflow:>app import http://bit.ly/Bacon-RELEASE-stream-applications-rabbit-maven
+Successfully registered 60 applications from [source.sftp, source.file.metadata, processor.tcp-client, source.s3.metadata, source.jms, source.ftp, processor.transform.metadata, source.time, sink.s3.metadata, sink.log, processor.scriptable-transform, source.load-generator, sink.websocket.metadata, source.syslog, processor.transform, sink.task-launcher-local.metadata, source.loggregator.metadata, source.s3, source.load-generator.metadata, processor.pmml.metadata, source.loggregator, source.tcp.metadata, processor.httpclient.metadata, sink.file.metadata, source.triggertask, source.twitterstream, source.gemfire-cq.metadata, processor.aggregator.metadata, source.mongodb, source.time.metadata, sink.counter.metadata, source.gemfire-cq, source.http, sink.tcp.metadata, sink.pgcopy.metadata, source.rabbit, sink.task-launcher-yarn, source.jms.metadata, sink.gemfire.metadata, sink.cassandra.metadata, processor.tcp-client.metadata, sink.throughput, processor.header-enricher, sink.task-launcher-local, sink.aggregate-counter.metadata, sink.mongodb, sink.log.metadata, processor.splitter, sink.hdfs-dataset, source.tcp, source.trigger, source.mongodb.metadata, processor.bridge, source.http.metadata, sink.ftp, source.rabbit.metadata, sink.jdbc, source.jdbc.metadata, sink.rabbit.metadata, sink.aggregate-counter, processor.pmml, sink.router.metadata, sink.cassandra, source.tcp-client.metadata, processor.filter.metadata, processor.groovy-transform, processor.header-enricher.metadata, source.ftp.metadata, sink.router, sink.redis-pubsub, source.tcp-client, processor.httpclient, sink.file, sink.websocket, sink.s3, source.syslog.metadata, sink.rabbit, sink.counter, sink.gpfdist.metadata, source.mail.metadata, source.trigger.metadata, processor.filter, sink.pgcopy, sink.jdbc.metadata, sink.gpfdist, sink.ftp.metadata, processor.splitter.metadata, sink.sftp, sink.field-value-counter, processor.groovy-filter.metadata, source.triggertask.metadata, sink.hdfs, processor.groovy-filter, sink.redis-pubsub.metadata, source.sftp.metadata, sink.field-value-counter.metadata, processor.bridge.metadata, processor.groovy-transform.metadata, processor.aggregator, sink.sftp.metadata, sink.throughput.metadata, sink.hdfs-dataset.metadata, sink.tcp, sink.task-launcher-cloudfoundry.metadata, source.mail, source.gemfire.metadata, source.jdbc, sink.task-launcher-yarn.metadata, sink.gemfire, source.gemfire, sink.hdfs.metadata, source.twitterstream.metadata, processor.tasklaunchrequest-transform, sink.task-launcher-cloudfoundry, source.file, sink.mongodb.metadata, processor.tasklaunchrequest-transform.metadata, processor.scriptable-transform.metadata]
+
+```
+Running a 'app list' in the SCDF shell will show everything we just imported. We can also see it in the dashboard view of the SCDF Server:
+
+https://<scdf server route>.cfapps.io/dashboard/index.html#/apps/apps
+	
+![alt text](scdf-app-list.png "Rabbit Manager")
 
 ## Transforming From SOAP to JSON
 
