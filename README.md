@@ -17,7 +17,7 @@ In this sample we will demonstrate:
 
 Messages are produced on the left and are sent to sinks on the right.
 
-![alt text](dataflow.png "Flow Of Data")
+![alt text](images/dataflow.png "Flow Of Data")
 
 This demo is built to run on PWS (Pivotal Web Services). This is a Pivotal managed installation of Pivotal Cloud Foundry on AWS.
 
