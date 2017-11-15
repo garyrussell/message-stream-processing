@@ -23,7 +23,7 @@ This demo is built to run on PWS (Pivotal Web Services). This is a Pivotal manag
 
 The components involved (including SCDF itself), and where they are deployed within the Cloud are as follows.
 
-![alt text](components.png "Components")
+![alt text](images/components.png "Components")
 
 ## Set Up
 
@@ -121,7 +121,7 @@ Similar to local, once the application is connected it will create the necessary
 
 Part of the Service in creating the Rabbit MQ Service is to create the manager.
 
-![alt text](rabbit-manager-view.png "Rabbit Manager")
+![alt text](images/rabbit-manager-view.png "Rabbit Manager")
 
 This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are created.
 
@@ -175,7 +175,7 @@ Running a 'app list' in the SCDF shell will show everything we just imported. We
 
 https://<scdf server route>.cfapps.io/dashboard/index.html#/apps/apps
 	
-![alt text](scdf-app-list.png "Rabbit Manager")
+![alt text](images/scdf-app-list.png "Rabbit Manager")
 
 ## Transforming The Message
 
@@ -211,7 +211,7 @@ This can be found in the Process component.
 	private void init() {
 		routingKeys = new ArrayList<String>();
 		routingKeys.add("java");
-		routingKeys.add(".net");
+		routingKeys.add("net");
 		routingKeys.add("log");
 		routingKeys.add("db");
 		routingKeys.add("file");
