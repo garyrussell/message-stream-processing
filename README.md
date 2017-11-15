@@ -79,11 +79,11 @@ applications:
 ```
 **NOTE:** It is bound to the same Rabbit MQ service SCDF is using. Do not change this as extra configuration is required to get SCDF and a step within a stream to use different instances of the same messaging service:
 
-https://docs.spring.io/spring-cloud-dataflow/docs/1.2.3.RELEASE/reference/htmlsingle/#spring-cloud-dataflow-global-properties
+If you are using multiple brokers (ie: Rabbit MQ and Kafka or two Rabbit MQ), there is a bit of extra configuration.
 
-For simplicity sake we will use the same Rabbit Service for everything.
+https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#spring-cloud-dataflow-stream-multi-binder
 
-The 'simple-message-producer' will create the Exchanges and Queues it requires upon start up. No configuration of the Rabbit Service is required for this demo.
+To keep things simple for this demo we will be using one Rabbit MQ service for everything.
 
 
 #### Setting Up RabbitMQ Locally (Only if you wish to build the message-producer)
@@ -108,7 +108,7 @@ http://127.0.0.1:15672/
 The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the 'simple-message-producer'.
 
 
-#### Setting Up RabbitMQ on PWS
+#### Setting Up RabbitMQ on PWS (Required to run the sample)
 
 Simply create a free instance of the CloudAMQP broker from the Marketplace:
 
@@ -123,7 +123,12 @@ Part of the Service in creating the Rabbit MQ Service is to create the manager.
 
 ![alt text](rabbit-manager-view.png "Rabbit Manager")
 
-This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are create 
+This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are created.
+
+
+The 'simple-message-producer' and SCDF itself will create the Rabbit Exchanges and Queues it required at run time.
+
+No configuration of the Rabbit Service is required for this demo.
 
 ### Connecting To SCDF via The Shell
 
@@ -172,21 +177,22 @@ https://<scdf server route>.cfapps.io/dashboard/index.html#/apps/apps
 	
 ![alt text](scdf-app-list.png "Rabbit Manager")
 
-## Transforming From SOAP to JSON
+## Transforming The Message
+
+Our unstructured text message will be transformed to JSON and enriched with data to route it.
 
 To do this we will need to:
 
 1. Create a Processor class with a Stream Listener to specifiy the input and output
-2. Install this application into the local maven repository (a remote one can be used as well)
-3. Register the component with the SCDF Data Server running on PWS
+2. Register the component with the SCDF Data Server running on PWS
 
-The Input is going to be the Rabbit MQ our message production application is posting messages too.
+To register the component we will need to host it somewhere. This is where the 'processor-repository' comes in. More on this later.
 
-The Output is a different Rabbit MQ. Specifically the one the SCDF streams are using as a backing data bus. Kafka can also be used here, however PWS does not have a Kafka service. So Rabbit it is.
+### Simple Message Processor
 
-A note on Queues in Spring Cloud Data Flow. If you are using multiple brokers (ie: Rabbit MQ and Kafka or two Rabbit MQ), there is a bit of extra configuration.
+This simple Spring Boot application is going to grab the messages from Rabbit MQ that the 'simple-message-producer' writes and transform and enrich them.
 
-https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#spring-cloud-dataflow-stream-multi-binder
+
 
 To make our lives simpler we will be using the same RabbitMQ instance for our message-producer to write too as well as SCDF to use as a backing message bus.
 
