@@ -387,6 +387,19 @@ stream create lws1 --definition "r1: rabbit --queues=messages | simple-message-p
 
 The result of this will be more Exchanges (and Queues) created in Rabbit MQ and more Applications to write messages to and from these Queues.
 
+![alt text](images/complete-stream-app-list.png "All Exchanges")
+
+We also have a lot of applications created in the Apps Manager.
+
+![alt text](images/complete-stream-exchanges.png "All applications")
+
+To run this sample we need to start the message flow. This can be done by starting/restarting the 'simple-message-producer' application. Once its back up we will see the messages hitting the 'message' exchange.
+
+After a short time messages will start showing up in the respective Exchanges at the end of the line.
+
+
+
+
 
 
 
