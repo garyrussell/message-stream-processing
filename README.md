@@ -55,6 +55,8 @@ Our messages will be unstructured texts messages being published on to Rabbit MQ
 
 The application that produces them is in the 'simple-message-producer' folder. This is a simple Spring Boot application that will write messages to a Rabbit MQ Exchange upon start up.
 
+#### Compiling The Application Locally
+
 To compile this you will need a RabbitMQ running locally (see below). Compilation can be done using the maven wrapper at the root of the application folder.
 
 ```shell
@@ -62,6 +64,18 @@ To compile this you will need a RabbitMQ running locally (see below). Compilatio
 ./mvnw clean package
 
 ```
+##### Setting Up RabbitMQ Locally (Only if you wish to compile the simple-message-producer)
+
+To build the 'simple-message-producer' locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory.
+
+The following Repo explains setting up Rabbit MQ for local usage:
+
+https://github.com/lshannon/rabbit-setup
+
+The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the 'simple-message-producer'.
+
+#### Deploying The Application To PCF
+
 Also in the root of the application folder is a manifest.yml file for deployment to PCF.
 
 ```yaml
@@ -77,29 +91,9 @@ applications:
    - scdf-rabbitmq-queue
 
 ```
-**NOTE:** It is bound to the same Rabbit MQ service SCDF is using. Do not change this as extra configuration is required to get SCDF and a step within a stream to use different instances of the same messaging service:
+**NOTE:** It is bound to the same Rabbit MQ service SCDF is using. Do not change this as extra configuration is required to get SCDF and a step within a stream to use different instances of the same messaging service
 
-If you are using multiple brokers (ie: Rabbit MQ and Kafka or two Rabbit MQ), there is a bit of extra configuration.
-
-https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#spring-cloud-dataflow-stream-multi-binder
-
-To keep things simple for this demo we will be using one Rabbit MQ service for everything.
-
-Upon starting/restarting this application it will fill the Rabbit Exchange called 'messages' with 10,000 text strings. Each are lines from various movies or TV shows. Worthless data...or is it?
-
-
-#### Setting Up RabbitMQ Locally (Only if you wish to build the message-producer)
-
-To build the 'simple-message-producer' locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory.
-
-The following Repo explains setting up Rabbit MQ for local usage:
-
-https://github.com/lshannon/rabbit-setup
-
-The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the 'simple-message-producer'.
-
-
-#### Setting Up RabbitMQ on PWS (Required to run the sample)
+##### Binding The Deployed Application To A Rabbit MQ Service
 
 We will bind the 'simple-message-producer' to the same Rabbit MQ service the SCDF server is using.
 
@@ -112,6 +106,18 @@ This is a useful interface to refer too. Here you can see where messages are goi
 The 'simple-message-producer' and SCDF itself will create the Rabbit Exchanges and Queues it required at run-time.
 
 No configuration of the Rabbit Service is required for this demo.
+
+##### Real World Considerations
+
+If you are using multiple brokers (ie: Rabbit MQ and Kafka or two Rabbit MQ), there is a bit of extra configuration.
+
+https://docs.spring.io/spring-cloud-dataflow/docs/current/reference/htmlsingle/#spring-cloud-dataflow-stream-multi-binder
+
+To keep things simple for this demo we will be using one Rabbit MQ service for everything.
+
+#### Producing the Messages
+
+Upon starting/restarting this application it will fill the Rabbit Exchange called 'messages' with 10,000 text strings. Each are lines from various movies or TV shows. Worthless data...or is it?
 
 ### Connecting To SCDF via The Shell
 
@@ -258,7 +264,7 @@ For a more robust solution for managing custom modules, Spring Cloud Skipper sho
 
 https://github.com/spring-cloud/spring-cloud-skipper
 
-#### Registering The Custom Component
+## Registering The Custom Component With SCDF
 
 Now custom component can be registered in the SCDF shell with the following command.
 
@@ -279,7 +285,7 @@ app unregister --name simple-message-processor --type processor
 For more on registering components:
 https://docs.spring.io/spring-cloud-dataflow/docs/1.2.1.RELEASE/reference/html/spring-cloud-dataflow-register-apps.html
 
-### Consuming The Message Into The Custom Processor
+## Using The Custom Processor In A SCDF Stream
 
 To test the custom processor, create a stream that routes the messages from the 'simple-message-producer' through the processor and into the logs.
 
@@ -311,7 +317,7 @@ If this successfully works the logs will contain the following:
 
 ```
 
-## Consuming the Routed Streams
+## Routing Messages Part 1 - Create The Destinations
 
 Lets start routing these messages. For now we will route to log files.
 
@@ -357,7 +363,7 @@ SCDF also creates Apps in PCF to handle the moving of messages from these Exchan
 
 Now we can set up the message routing.
 
-## Routing Messages
+## Routing Messages Part 2 - Adding Routing Key
 
 To do this we will take the messages, pass it through the processor where we add the 'routingKey' and final send it to a Rabbit Exchange named the same as that routing key (these were created in the previous step).
 
