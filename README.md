@@ -101,20 +101,13 @@ The message-producer application is configured to create the Exchanges and Queue
 
 #### Setting Up RabbitMQ on PWS (Required to run the sample)
 
-As Rabbit is heavily used in this sample, a paid subscription of CloudAMQP broker from the Marketplace:
+We will bind the 'simple-message-producer' to the same Rabbit MQ service the SCDF server is using.
 
-```shell
-
-cf create-service cloudamqp tiger scdf-rabbitmq-queue
-
-```
-Similar to local, once the application is connected it will create the necessary queues and exchanges.
-
-Part of the Service in creating the Rabbit MQ Service is to create the manager.
+Part of the Service in creating the Rabbit MQ Service is to create the manager interface.
 
 ![alt text](images/rabbit-manager-view.png "Rabbit Manager")
 
-This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are created.
+This is a useful interface to refer too. Here you can see where messages are going and what Exchanges and Queues are created. Its also useful to clean up Queues and Exchanges not in use.
 
 The 'simple-message-producer' and SCDF itself will create the Rabbit Exchanges and Queues it required at run-time.
 
