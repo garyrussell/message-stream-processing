@@ -90,29 +90,18 @@ Upon starting/restarting this application it will fill the Rabbit Exchange calle
 
 #### Setting Up RabbitMQ Locally (Only if you wish to build the message-producer)
 
-To build the 'simple-message-producer' locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory. With a Mac installing Rabbit can be done using Brew:
+To build the 'simple-message-producer' locally you will need a RabbitMQ running locally, otherwise the Test will not pass as the RabbitTemplate will not be able to create a ConnectionFacactory.
 
-```shell
+The following Repo explains setting up Rabbit MQ for local usage:
 
-brew install rabbitmq
-
-...
-
-brew services start rabbitmq
-
-```
-After the installation, admin console can be found here:
-
-http://127.0.0.1:15672/
-
-(guest/guest)
+https://github.com/lshannon/rabbit-setup
 
 The message-producer application is configured to create the Exchanges and Queues it needs upon start up. A Fan Out exchange called 'messages' will be created, a Queue also called 'messages' (lazy with the naming) is created. The Exchange is bound to the Queue. These details can be found in the MessageQueueConfig class of the 'simple-message-producer'.
 
 
 #### Setting Up RabbitMQ on PWS (Required to run the sample)
 
-Simply create a free instance of the CloudAMQP broker from the Marketplace:
+As Rabbit is heavily used in this sample, a paid subscription of CloudAMQP broker from the Marketplace:
 
 ```shell
 
