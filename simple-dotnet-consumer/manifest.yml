@@ -1,0 +1,6 @@
+---
+applications:
+- name: dotnet-consumer
+  memory: 1G
+  path: SimpleConsumer/bin/Release/PublishOutput/
+  random-route: true
