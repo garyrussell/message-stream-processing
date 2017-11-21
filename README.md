@@ -389,6 +389,24 @@ Once its back up we will see the messages hitting the 'message' exchange.
 
 After a short time messages will start showing up in the respective Exchanges at the end of the line.
 
+## Connecting A .NET Client To Receive Messages
+
+The folder contains a simple .NET client. It contains an HTTP endpoint 'api/values' that JSON can be posted too. Anything received by this endpoint will be written to console, which will end up in the PCF log stream.
+
+### Deploying the Application
+
+From the root folder 'simple-dotnet-consumer' simply run a `cf push`. The manifest.yml contains all the details required to push the application with a random route.
+
+#### Compiling the Application
+
+Visual Studio is required to build and package this sample. This is not covered in this repository.
+
+## Connecting A Java Client To Receive Messages
+
+## Writing To A Database
+
+## Writing To A File System
+
 
 
 
