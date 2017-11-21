@@ -409,9 +409,6 @@ Visual Studio is required to build and package this sample. This is not covered 
 
 ## Writing To A Database
 
-## Writing To A File System
-
-
 
 
 
