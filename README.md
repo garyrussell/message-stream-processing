@@ -6,6 +6,10 @@ This demo shows how to process, enrich and route messages to different sinks usi
 
 https://docs.spring.io/spring-cloud-dataflow/docs/current-SNAPSHOT/reference/htmlsingle/#getting-started-system-requirements
 
+Details on the sources and sinks used in creating streams can be found here:
+
+https://docs.spring.io/spring-cloud-stream-app-starters/docs/Bacon.RELEASE/reference/html/
+
 In this sample we will demonstrate:
 
 1. Streams to capture data
