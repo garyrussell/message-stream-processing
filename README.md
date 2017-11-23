@@ -395,13 +395,11 @@ After a short time messages will start showing up in the respective Exchanges at
 
 ## Connecting A .NET Client To Receive Messages
 
-The folder contains a simple .NET client. It contains an HTTP endpoint 'api/values' that JSON can be posted too. Anything received by this endpoint will be written to console, which will end up in the PCF log stream.
+The folder contains a simple .NET client that grabs messages off a Rabbit MQ Exchange.
 
 ### Deploying the Application
 
 From the root folder 'simple-dotnet-consumer' simply run a `cf push`. The manifest.yml contains all the details required to push the application with a random route.
-
-This .NET application will grab message off of the Rabbit MQ Exchange.
 
 #### Compiling the Application
 
