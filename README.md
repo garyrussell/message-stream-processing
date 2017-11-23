@@ -401,13 +401,44 @@ The folder contains a simple .NET client. It contains an HTTP endpoint 'api/valu
 
 From the root folder 'simple-dotnet-consumer' simply run a `cf push`. The manifest.yml contains all the details required to push the application with a random route.
 
+This .NET application will grab message off of the Rabbit MQ Exchange.
+
 #### Compiling the Application
 
 Visual Studio is required to build and package this sample. This is not covered in this repository.
 
-## Connecting A Java Client To Receive Messages
+#### Deploying the Application to PCF
+
+#### Verifying The Messages
 
 ## Writing To A Database
+
+## Getting Messages In The Java Client
+
+For these messages the Java client will pick up the messages from a database we populated in the previous step
+
+### Compiling The Application
+
+### Deploying to PCF
+
+### Verify the Messages
+
+## Writing To HDFS
+
+For Audit puposes all messages will be passed into HDFS for storage.
+
+### Setting Up HDFS on AWS
+
+### Writing to HDFS
+
+### Verifying The Messages
+
+## Counting and Metrics
+
+## Notes and Considerations
+
+
+
 
 
 
