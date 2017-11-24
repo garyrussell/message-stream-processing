@@ -411,6 +411,55 @@ Visual Studio is required to build and package this sample. This is not covered 
 
 ## Writing To A Database
 
+### Creating the Database
+
+First we will create the database from PWS's marketplace:
+
+```shell
+
+cf create-service elephantsql panda message-db
+
+```
+
+We need a plan that allows for more connections than the free one. This will incur a cost.
+
+By getting info from the message-db, a link to the management console can be obtained.
+
+```shell
+
+➜  message-stream-processing git:(master) cf service message-db
+
+Service instance: message-db
+Service: elephantsql
+Bound apps: 
+Tags: 
+Plan: panda
+Description: PostgreSQL as a Service
+Documentation url: http://docs.run.pivotal.io/marketplace/services/elephantsql.html
+Dashboard: https://cloudfoundry.appdirect.com/api/custom/cloudfoundry/v2/sso/start?serviceUuid=xxxxxxxxxxxxxxxxxxxx
+
+Last Operation
+Status: create succeeded
+Message: 
+Started: 2017-11-24T16:49:44Z
+Updated: 2017-11-24T16:49:44Z
+
+```
+The management console will give everything needed to connect to the DB from a Stream. In the screenshot below these credentials have been blocked out for security purposes.
+
+```shell
+
+dataflow:>stream create --name db1 --definition "time --max-messages=10 | jdbc --driver-class-name=org.postgresql.Driver --username=yldryksn --password=pleuMWy6tY5h5K3OWrf3Z169eoxxhT_4 --url=jdbc:postgresql://baasu.db.elephantsql.com:5432/yldryksn --jdbc.initialize=true" --deploy
+Created new stream 'db1'
+Deployment request has been sent
+
+
+```
+
+This will get write the payload of messages in the stream to a table in the DB called 'messages'.
+
+![alt text](images/restart-simple-message-producer.png "DB")
+
 ## Getting Messages In The Java Client
 
 For these messages the Java client will pick up the messages from a database we populated in the previous step
