@@ -79,7 +79,10 @@ public class JavaConsumerApplication {
 	
 	@Bean
 	public TransactionInterceptor transactionInterceptor(PlatformTransactionManager tm) {
-		return new TransactionInterceptor(tm, new MatchAlwaysTransactionAttributeSource());
+		TransactionInterceptor inter = new TransactionInterceptor();
+		inter.setTransactionManager(tm);
+		inter.setTransactionAttributeSource(null);
+		return inter;
 	}
 	
 	/*
