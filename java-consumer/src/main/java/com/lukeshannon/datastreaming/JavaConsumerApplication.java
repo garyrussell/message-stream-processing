@@ -1,16 +1,15 @@
 package com.lukeshannon.datastreaming;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -31,19 +30,19 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 
 @SpringBootApplication
 public class JavaConsumerApplication {
-	
-	
+
+
 	private static final Logger log = LoggerFactory.getLogger(JavaConsumerApplication.class);
 
 
 	public static void main(String[] args) {
 		SpringApplication.run(JavaConsumerApplication.class, args);
 	}
-	
+
 	@Autowired
 	private MessageRepo repository;
 
-	
+
 	@Bean
 	@Transactional
 	public CommandLineRunner newRecords(MessageRepo repository) {
@@ -55,7 +54,7 @@ public class JavaConsumerApplication {
 			// save a couple of customers
 			repository.save(new Message("Key", "Message", false, new Date(), Long.valueOf(1)));
 			repository.save(new Message("Key2", "Message2", false, new Date(), Long.valueOf(2)));
-		
+
 
 			// For testing
 			// fetch all the customers
@@ -68,36 +67,23 @@ public class JavaConsumerApplication {
 
 		};
 	}
-	
+
 	@Bean
 	public PollerMetadata poller(PlatformTransactionManager tm) {
 		PollerMetadata poller = new PollerMetadata();
 		poller.setTrigger(new PeriodicTrigger(5, TimeUnit.SECONDS));
-		poller.setAdviceChain(Arrays.asList(transactionInterceptor(tm)));
+		poller.setAdviceChain(Arrays.asList(consumerTransactionInterceptor(tm)));
+		poller.setMaxMessagesPerPoll(1); // 1 collection per poll
 		return poller;
 	}
-	
+
 	@Bean
-	public TransactionInterceptor transactionInterceptor(PlatformTransactionManager tm) {
+	public TransactionInterceptor consumerTransactionInterceptor(PlatformTransactionManager tm) {
 		TransactionInterceptor inter = new TransactionInterceptor();
 		inter.setTransactionManager(tm);
-		inter.setTransactionAttributeSource(null);
+		inter.setTransactionAttributeSource(new MatchAlwaysTransactionAttributeSource());
 		return inter;
 	}
-	
-	/*
-	 * TODO: Make this transactions so this will not update the record till the ServiceActivator has got it
-	 * @param dataSource
-	 * @return
-	 */
-//	@InboundChannelAdapter(channel = "fromdb", poller = @Poller(fixedDelay = "5000", maxMessagesPerPoll="-1"))
-//	@InboundChannelAdapter(channel = "fromdb", poller = @Poller("poller"))
-//	@Bean
-//	public MessageSource<?> source(DataSource dataSource) {
-//		JdbcPollingChannelAdapter adapter = new JdbcPollingChannelAdapter(dataSource, "SELECT * FROM message WHERE processed = false");
-//		adapter.setUpdateSql("UPDATE message SET processed = true WHERE id in (:id)");
-//		return adapter;
-//	}
 
 	@Bean
 	public JpaExecutor executor(EntityManagerFactory entityManagerFactory) {
@@ -105,18 +91,22 @@ public class JavaConsumerApplication {
 		executor.setJpaQuery("from Message where processed = false");
 		return executor;
 	}
-	
+
 	@InboundChannelAdapter(channel = "fromdb", poller = @Poller("poller"))
 	@Bean
 	public MessageSource<?> source(EntityManagerFactory entityManagerFactory) {
 		return new JpaPollingChannelAdapter(executor(entityManagerFactory));
 	}
 
-	boolean done;
-	
+	private boolean doneAbort;
+
+	private boolean addAnotherDone;
+
 	@ServiceActivator(inputChannel = "fromdb")
 	public void foo(List<Message> in) {
-
+		for (Message m : in) {
+			m.setProcessed(true);
+		}
 		log.info("Processed: " +  in.toString());
 		// For testing
 					// fetch all the customers
@@ -126,13 +116,16 @@ public class JavaConsumerApplication {
 						log.info(message.toString());
 					}
 					log.info("");
-		for (Message m : in) {
-			m.setProcessed(true);
-			this.repository.save(m);
-		}
-		if (!done) {
-			done = true;
+		this.repository.save(in);
+		if (!doneAbort) {
+			log.info("Rolling back");
+			doneAbort = true;
 			throw new RuntimeException("foo");
+		}
+		if (!addAnotherDone) {
+			addAnotherDone = true;
+			repository.save(new Message("Key3", "Message3", false, new Date(), Long.valueOf(3)));
+			log.info("Added another");
 		}
  	}
 
